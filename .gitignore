@@ -1,0 +1,18 @@
+# Simulacion (Icarus Verilog)
+*.vvp
+*.out
+*_tb
+alu_tb
+
+# Formas de onda
+*.vcd
+*.fst
+*.fst.hier
+*.ghw
+*.gtkw
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
