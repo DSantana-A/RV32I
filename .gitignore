@@ -16,3 +16,26 @@ alu_tb
 
 # macOS
 .DS_Store
+
+# VCS generated files
+csrc/
+simv
+simv.daidir/
+ucli.key
+*.log
+*.vpd
+*.vcd
+*.fsdb
+novas.*
+verdiLog/
+
+# Icarus
+*.vvp
+sim
+
+# Synthesis
+*.svf
+alib-*
+
+# macOS
+.DS_Store
