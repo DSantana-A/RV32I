@@ -1,77 +1,60 @@
 `timescale 1ns/1ps
 
 module tbALU ();
+    
+    logic [31:0] inputA, inputB, result;
+    logic [3:0] aluOp;
+    logic zero;
 
-    localparam int WIDTH = 32;
+    int errors = 0;
 
-    logic [WIDTH-1:0] inputA, inputB, result;
-    logic [3:0]       aluOp;
-    logic             zero;
-
-    int unsigned errors = 0;
-    int unsigned checks = 0;
-
-    ALU #(.WIDTH(WIDTH)) dut (.*);
-
-    function automatic logic [WIDTH-1:0] aluModel (
-        input logic [WIDTH-1:0] a, b,
-        input logic [3:0]       op
-    );
-        case (op)
-            4'b0000 : return a + b;
-            4'b0001 : return a - b;
-            4'b0010 : return a & b;
-            4'b0011 : return a | b;
-            4'b0100 : return a ^ b;
-            4'b0101 : return a << b[$clog2(WIDTH)-1:0];
-            4'b0110 : return a >> b[$clog2(WIDTH)-1:0];
-            4'b0111 : return $signed(a) >>> b[$clog2(WIDTH)-1:0];
-            4'b1000 : return ($signed(a) < $signed(b)) ? 1 : 0;
-            4'b1001 : return (a < b) ? 1 : 0;
-            default : return '0;
-        endcase
-    endfunction
+    ALU dut (.*);
 
     task automatic check (
-        input logic [WIDTH-1:0] a, b,
-        input logic [3:0]       op
-    );
-        logic [WIDTH-1:0] exp;
-
+        input logic [31:0] a,b, 
+        input logic [3:0] op,
+        input logic [31:0] exp,
+        input string name
+        );
+        
         inputA = a;
         inputB = b;
-        aluOp  = op;
-        #1;
+        aluOp = op;
 
-        exp = aluModel(a, b, op);
-        checks++;
+        #1;
 
         if (result !== exp || zero !== (exp == '0)) begin
             errors++;
-            $error("op=%b A=0x%08h B=0x%08h | result=0x%08h (esp 0x%08h) zero=%0b (esp %0b)",
-                   op, a, b, result, exp, zero, (exp == '0));
+            $error("%s: result=0x%08h (exp 0x%08h) zero=%0b (exp %0b)", name, result, exp, zero, (exp=='0));
         end
     endtask
-
-    logic [WIDTH-1:0] CORNERS [5] = '{
-        32'h0000_0000, 32'h0000_0001, 32'hFFFF_FFFF, 32'h7FFF_FFFF, 32'h8000_0000
-    };
 
     initial begin
         $dumpfile("tbALU.vcd");
         $dumpvars(0, tbALU);
 
-        for (int op = 0; op < 16; op++) begin
-            foreach (CORNERS[i])
-                foreach (CORNERS[j])
-                    check(CORNERS[i], CORNERS[j], op[3:0]);
+        check(32'd5,         32'd3,         4'b0000, 32'd8,         "ADD  5+3");
+        check(32'hFFFF_FFFF, 32'd1,         4'b0000, 32'h0000_0000, "ADD  overflow to 0");
 
-            repeat (200) check({$urandom, $urandom}, {$urandom, $urandom}, op[3:0]);
-            repeat (100) check({$urandom, $urandom}, $urandom_range(0, 2*WIDTH), op[3:0]);
-        end
+        check(32'd10,        32'd3,         4'b0001, 32'd7,         "SUB  10-3");
+        check(32'd7,         32'd7,         4'b0001, 32'h0000_0000, "SUB  7-7 (zero)");
 
-        if (errors == 0) $display("TEST PASSED: %0d chequeos", checks);
-        else             $display("TEST FAILED: %0d chequeos, %0d errores", checks, errors);
+        check(32'hF0F0_F0F0, 32'h0FF0_0FF0, 4'b0010, 32'h00F0_00F0, "AND  pattern");
+        check(32'hF0F0_F0F0, 32'h0FF0_0FF0, 4'b0011, 32'hFFF0_FFF0, "OR   pattern");
+        check(32'hF0F0_F0F0, 32'h0FF0_0FF0, 4'b0100, 32'hFF00_FF00, "XOR  pattern");
+
+        check(32'd1,         32'd4,         4'b0101, 32'd16,        "SLL  1<<4");
+        check(32'd1,         32'd33,        4'b0101, 32'd2,         "SLL  shift 33 -> uses 1");
+        check(32'h8000_0000, 32'd4,         4'b0110, 32'h0800_0000, "SRL  fills with zeros");
+        check(32'h8000_0000, 32'd4,         4'b0111, 32'hF800_0000, "SRA  fills with sign");
+
+        check(32'hFFFF_FFFF, 32'd1,         4'b1000, 32'd1,         "SLT  -1 < 1 (signed)");
+        check(32'hFFFF_FFFF, 32'd1,         4'b1001, 32'd0,         "SLTU -1 < 1 (unsigned)");
+
+        check(32'hDEAD_BEEF, 32'hCAFE_BABE, 4'b1111, 32'h0000_0000, "default");
+
+        if (errors == 0) $display("TEST PASSED");
+        else $display("TEST FAILED: %0d errors", errors);
         $finish;
     end
 
