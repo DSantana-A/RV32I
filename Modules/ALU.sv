@@ -26,7 +26,7 @@ always_comb begin : ALU
 
         default: result = '0; 
     endcase
-end
+    end
 
     assign zero = (result == '0);
 endmodule

@@ -10,7 +10,11 @@ module InstructionMemory #(
     
     logic [31:0] mem [DEPTH];
 
-    initial $readmemh(HEXFILE, mem);
+    initial begin
+        foreach (mem[i]) mem[i] = '0;
+        $readmemh(HEXFILE, mem);
+    end
+
     assign instr = mem[addr[$clog2(DEPTH)+1:2]];
 
 endmodule
