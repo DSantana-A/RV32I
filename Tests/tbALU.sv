@@ -51,6 +51,9 @@ module tbALU ();
         check(32'hFFFF_FFFF, 32'd1,         4'b1000, 32'd1,         "SLT  -1 < 1 (signed)");
         check(32'hFFFF_FFFF, 32'd1,         4'b1001, 32'd0,         "SLTU -1 < 1 (unsigned)");
 
+        check(32'hDEAD_BEEF, 32'h1234_5000, 4'b1010, 32'h1234_5000, "PASS  lets B through");
+
+
         check(32'hDEAD_BEEF, 32'hCAFE_BABE, 4'b1111, 32'h0000_0000, "default");
 
         if (errors == 0) $display("TEST PASSED");

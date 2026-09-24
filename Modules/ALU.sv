@@ -23,6 +23,7 @@ always_comb begin : ALU
 
        4'b1000: result = ($signed(inputA) < $signed(inputB))? 1 : 0;    // SLT:  SET LESS THAN (SIGN)
         4'b1001: result = (inputA<inputB) ? 1 : 0;                                     //SLTU: SET LESS THAN (NO SIGN)
+        4'b1010: result = inputB; //PASS: LETS B PASS
 
         default: result = '0; 
     endcase
