@@ -23,7 +23,7 @@ module DataMemory #(
     assign byteSel = word[8*addr[1:0]+: 8];
     assign halfSel = word[16*addr[1] +: 16];
 
-    always_ff @( posedge clk ) begin : Write
+    always @( posedge clk ) begin : Write
         if (memWrite) begin
             case (funct3[1:0])
                 2'b00 : mem[index][8*addr[1:0] +: 8] <= writeData[7:0];
