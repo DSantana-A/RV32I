@@ -1,4 +1,4 @@
-set target_library /home/a01403474/lib/stdcell_hvt/db_nldm/saed32hvt_ss0p75v125c.db
+set target_library /opt/pdk/digitalbootcamp/ICC2/lib/sky130_fd_sc_hd/db_nldm/sky130_fd_sc_hd__tt_025C_1v80.db
 set link_library "* $target_library"
 
 read_file -format sverilog {ALU.sv RegisterFile.sv ImmediateGenerator.sv ProgramCounter.sv InstructionMemory.sv DataMemory.sv ControlUnit.sv RV32I.sv}
