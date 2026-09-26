@@ -1,7 +1,7 @@
 set target_library /opt/pdk/digitalbootcamp/ICC2/lib/sky130_fd_sc_hd/db_nldm/sky130_fd_sc_hd__tt_025C_1v80.db
 set link_library "* $target_library"
 
-read_file -format sverilog {ALU.sv RegisterFile.sv ImmediateGenerator.sv ProgramCounter.sv InstructionMemory.sv DataMemory.sv ControlUnit.sv RV32I.sv}
+read_file -format sverilog {Modules/ALU.sv Modules/RegisterFile.sv Modules/ImmediateGenerator.sv Modules/ProgramCounter.sv Modules/InstructionMemory.sv Modules/DataMemory.sv Modules/ControlUnit.sv Modules/RV32I.sv}
 current_design RV32I
 current_design RV32I
 create_clock -name clk -period 20 [get_ports clk]
