@@ -3,7 +3,6 @@ set link_library "* $target_library"
 
 read_file -format sverilog {Modules/ALU.sv Modules/RegisterFile.sv Modules/ImmediateGenerator.sv Modules/ProgramCounter.sv Modules/InstructionMemory.sv Modules/DataMemory.sv Modules/ControlUnit.sv Modules/RV32I.sv}
 current_design RV32I
-current_design RV32I
 create_clock -name clk -period 20 [get_ports clk]
 compile_ultra
 
