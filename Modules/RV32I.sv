@@ -25,10 +25,10 @@ module RV32I (
         .pcPlus4(pcPlus4)
     );
 
-    InstructionMemory #(.HEXFILE("Src/test_basic.hex")) imem (
-        .addr(pc),
-        .instr(instr)
-    );
+    InstructionMemory imem (
+    .addr(pc),
+    .instr(instr)
+);
 
     ControlUnit ctrl (
         .opcode(instr[6:0]),
