@@ -10,7 +10,7 @@ sh rm -rf RV32I_lib
 create_lib -technology $TECH -ref_libs $NDM RV32I_lib
 
 read_verilog RV32I_synth.v
-current_design RV32I
+current_design RV32I_core
 link_block
 
 create_corner "worst"
