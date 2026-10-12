@@ -15,7 +15,8 @@ module RV32I (
         .dmemAddr(dmemAddr), .dmemWData(dmemWData), .dmemRData(dmemRData)
     );
 
-    InstructionMemory imem (.addr(pc), .instr(instr));
+    InstructionMemory imem (.clk(clk), .we(1'b0), .waddr('0), .wdata('0),
+                        .addr(pc), .instr(instr));
 
     DataMemory dmem (
         .clk(clk), .memWrite(memWrite), .funct3(memFunct3),
