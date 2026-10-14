@@ -12,7 +12,7 @@ module DataMemory #(
     localparam int SHIFT = 2;
     logic [31:0] mem [DEPTH];
     logic [$clog2(DEPTH)-1:0] index;
-
+    
     logic [31:0] word;
     logic [7:0] byteSel;
     logic [15:0] halfSel;
