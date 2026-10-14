@@ -63,7 +63,7 @@ place_opt
 clock_opt
 route_auto
 route_detail -incremental true -max_number_iterations 40
-route_opt
+route_detail -incremental true -max_number_iterations 20
 check_routes > pnr_drc.txt
 
 # Fillers y conexión final de power
