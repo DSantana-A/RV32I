@@ -23,7 +23,7 @@ create_scenario -mode "functional" -name "functional_worst" -corner worst
 read_sdc RV32I.sdc
 
 # Floorplan con margen para el anillo
-initialize_floorplan -core_utilization 0.5 -core_offset 15
+initialize_floorplan -core_utilization 0.55 -core_offset 15
 place_pins -self
 
 # Tap cells
@@ -44,8 +44,8 @@ compile_pg -strategies ring_strat
 
 # Malla
 create_pg_mesh_pattern mesh_pat -layers { \
-    {{vertical_layer: met4}   {width: 1.6} {pitch: 50} {spacing: interleaving}} \
-    {{horizontal_layer: met5} {width: 1.6} {pitch: 50} {spacing: interleaving}} }
+    {{vertical_layer: met4}   {width: 1.6} {pitch: 150} {spacing: interleaving}} \
+    {{horizontal_layer: met5} {width: 1.6} {pitch: 150} {spacing: interleaving}} }
 set_pg_strategy mesh_strat -core -pattern {{name: mesh_pat} {nets: {VPWR VGND}}} \
     -extension {{stop: outermost_ring}}
 compile_pg -strategies mesh_strat
