@@ -59,22 +59,25 @@ check_pg_connectivity > pnr_pg.txt
 
 # Placement, reloj y ruteo
 set_app_options -name place.coarse.continue_on_missing_scandef -value true
+set_ignored_layers -min_routing_layer met1
 place_opt
 clock_opt
 route_auto
 route_detail -incremental true -max_number_iterations 40
 route_opt
 route_detail -incremental true -max_number_iterations 20
-check_routes > pnr_drc.txt
 
 # Fillers y conexión final de power
 create_stdcell_fillers -lib_cells [get_lib_cells *fill*]
 connect_pg_net -net VPWR [get_pins -hierarchical {*/VPWR */VPB}]
 connect_pg_net -net VGND [get_pins -hierarchical {*/VGND */VNB}]
+check_routes > pnr_drc.txt
+check_lvs -max_errors 50 > pnr_lvs.txt
 check_pg_connectivity > pnr_pg_final.txt
 
 report_utilization > pnr_area.txt
 report_global_timing > pnr_timing.txt
-write_gds -merge_files [glob /opt/pdk/sky130/lib/sky130_fd_sc_hd/gds/*.gds] RV32I.gds
+write_gds -layer_map /opt/pdk/digitalbootcamp/ICC2/tech/milkyway/sky130_fd_sc_hd.mw.map \
+          -merge_files [glob /opt/pdk/sky130/lib/sky130_fd_sc_hd/gds/*.gds] RV32I.gds
 save_lib
 exit
