@@ -5,7 +5,7 @@ module RV32I_asic (
     input  logic        imemWe,       // carga del programa con reset en 1
     input  logic [31:0] imemWAddr,
     input  logic [31:0] imemWData,
-    output logic [31:0] dbgPC,        // salidas para que DC no elimine la lógica
+    output logic [31:1] dbgPC,        // salidas para que DC no elimine la lógica
     output logic [31:0] dbgDmemAddr
 );
     logic [31:0] pc, instr, dmemAddr, dmemWData, dmemRData;
@@ -29,6 +29,6 @@ module RV32I_asic (
         .addr(dmemAddr), .writeData(dmemWData), .readData(dmemRData)
     );
 
-    assign dbgPC       = pc;
+    assign dbgPC       = pc[31:1];
     assign dbgDmemAddr = dmemAddr;
 endmodule
