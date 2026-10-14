@@ -46,7 +46,8 @@ compile_pg -strategies ring_strat
 create_pg_mesh_pattern mesh_pat -layers { \
     {{vertical_layer: met4}   {width: 1.6} {pitch: 50} {spacing: interleaving}} \
     {{horizontal_layer: met5} {width: 1.6} {pitch: 50} {spacing: interleaving}} }
-set_pg_strategy mesh_strat -core -pattern {{name: mesh_pat} {nets: {VPWR VGND}}}
+set_pg_strategy mesh_strat -core -pattern {{name: mesh_pat} {nets: {VPWR VGND}}} \
+    -extension {{stop: outermost_ring}}
 compile_pg -strategies mesh_strat
 
 # Rieles de celdas
