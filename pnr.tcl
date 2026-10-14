@@ -23,7 +23,7 @@ create_scenario -mode "functional" -name "functional_worst" -corner worst
 read_sdc RV32I.sdc
 
 # Floorplan con margen para el anillo
-initialize_floorplan -core_utilization 0.55 -core_offset 15
+initialize_floorplan -core_utilization 0.5 -core_offset 15
 place_pins -self
 
 # Tap cells
