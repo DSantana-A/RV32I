@@ -60,6 +60,9 @@ check_pg_connectivity > pnr_pg.txt
 # Placement, reloj y ruteo
 set_app_options -name place.coarse.continue_on_missing_scandef -value true
 set_ignored_layers -min_routing_layer met1
+set_app_options -name route.common.global_min_layer_mode -value hard
+set_app_options -name route.common.net_min_layer_mode -value hard
+set_app_options -name route.common.clock_net_min_layer_mode -value hard
 place_opt
 clock_opt
 route_auto
