@@ -1,6 +1,8 @@
 `timescale 1ns/1ps
 
-module RV32I (
+module RV32I #(
+    parameter HEXFILE = "Src/testBasic.hex"
+)(
     input  logic clk, reset,
     output logic [31:0] pc, instr
 );
@@ -15,7 +17,7 @@ module RV32I (
         .dmemAddr(dmemAddr), .dmemWData(dmemWData), .dmemRData(dmemRData)
     );
 
-    InstructionMemory imem (.clk(clk), .we(1'b0), .waddr('0), .wdata('0),
+    InstructionMemory #(.HEXFILE(HEXFILE)) imem (.clk(clk), .we(1'b0), .waddr('0), .wdata('0),
                         .addr(pc), .instr(instr));
 
     DataMemory dmem (

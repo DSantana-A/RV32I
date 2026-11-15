@@ -1,7 +1,8 @@
 `timescale 1ns/1ps
 
 module InstructionMemory #(
-    parameter int DEPTH = 64
+    parameter int DEPTH = 64,
+    parameter HEXFILE = "Src/testBasic.hex"
 ) (
     input  logic        clk,
     input  logic        we, 
@@ -15,7 +16,7 @@ module InstructionMemory #(
 
     initial begin
         foreach (mem[i]) mem[i] = '0;
-        $readmemh("Src/test_basic.hex", mem);
+        $readmemh(HEXFILE, mem);
     end
 
     always @( posedge clk ) begin : blockName
