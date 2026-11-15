@@ -80,6 +80,9 @@ check_pg_connectivity > pnr_pg_final.txt
 
 report_utilization > pnr_area.txt
 report_global_timing > pnr_timing.txt
+foreach n {VPWR VGND} {
+    create_terminal -of_objects [index_collection [get_shapes -of_objects [get_nets $n] -filter "shape_use==ring && layer_name==met4"] 0]
+}
 write_gds -layer_map /opt/pdk/digitalbootcamp/ICC2/tech/milkyway/sky130_fd_sc_hd.mw.map \
           -merge_files [glob /opt/pdk/sky130/lib/sky130_fd_sc_hd/gds/*.gds] RV32I.gds
 save_lib
