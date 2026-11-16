@@ -1,8 +1,8 @@
 `timescale 1ns/1ps
 
 module tbRV32I;
-    logic clk = 0, reset = 1;
-    int errors = 0;
+    logic clk = 0, reset = 1, done = 0;
+    int errors = 0, cycles = 0, instret = 0;
     RV32I #(.HEXFILE("Src/testHazards.hex")) dut (.clk(clk), .reset(reset));
 
     always #5 clk = ~clk;
@@ -21,6 +21,18 @@ module tbRV32I;
         end
         
     endtask //automatic
+
+    always @(posedge clk) begin
+        if (!reset && !done) begin
+            cycles++;
+            if (dut.core.validE) begin
+                instret++;
+                if (dut.core.pcE == 32'h70) begin
+                    done <= 1;
+                end
+            end
+        end
+    end
 
     initial begin
         #12 reset = 0;           // suelta reset después del primer flanco
@@ -60,8 +72,9 @@ module tbRV32I;
             $display("OK   mem[2] = 00000064"); 
         end
 
+        $display("cycles=%0d  instret=%0d  CPI=%0.2f", cycles, instret, real'(cycles)/instret);
         if (errors == 0) $display("PASS");
-        else             $display("FAIL: %0d errores", errors);
+        else  $display("FAIL: %0d errores", errors);
         $finish;
     end
 endmodule

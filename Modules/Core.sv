@@ -21,7 +21,7 @@ module RV32I_core (
     logic [2:0]  immSrcD, funct3D;
     logic [1:0]  resultSrcD;
     logic regWriteD, aluSrcD, branchD, jumpD, aluSrcAD, jalrD, memWriteD;
-    logic stallD, flushD;
+    logic stallD, flushD, validD;
 
     // ----- EX -----
     logic [31:0] pcE, pcPlus4E, immExtE, rdData1E, rdData2E;
@@ -31,20 +31,20 @@ module RV32I_core (
     logic [2:0]  funct3E;
     logic [1:0]  resultSrcE, forwardAE, forwardBE;
     logic regWriteE, aluSrcE, aluSrcAE, branchE, jumpE, jalrE, memWriteE;
-    logic zero, condition, pcSrcE, flushE;
+    logic zero, condition, pcSrcE, flushE, validE;
 
     // ----- MEM -----
     logic [31:0] aluResultM, writeDataM, pcPlus4M, readDataM;
     logic [4:0]  rdM;
     logic [2:0]  funct3M;
     logic [1:0]  resultSrcM;
-    logic memWriteM, regWriteM;
+    logic memWriteM, regWriteM, validM;
 
     // ----- WB -----
     logic [31:0] aluResultW, readDataW, pcPlus4W, resultW;
     logic [4:0]  rdW;
     logic [1:0]  resultSrcW;
-    logic regWriteW;
+    logic regWriteW, validW;
 
     // ===== IF =====
     ProgramCounter pcReg (
@@ -60,10 +60,12 @@ module RV32I_core (
             instrD <= 32'h0000_0013;
             pcD <= '0;
             pcPlus4D <= '0; 
+            validD <= 1'b0;
         end else if (!stallD) begin
             instrD <= instrF;
             pcD <= pcF;
             pcPlus4D <= pcPlus4F;
+            validD <= 1'b1;
         end
     end
 
@@ -109,6 +111,7 @@ module RV32I_core (
             rdE <= '0;
             rs1E <= '0;
             rs2E <= '0;
+            validE <= 1'b0;
         end else begin
             aluSrcAE <= aluSrcAD;
             aluSrcE <= aluSrcD;
@@ -128,6 +131,7 @@ module RV32I_core (
             rdE <= rdD;
             rs1E <= rs1D;
             rs2E <= rs2D;
+            validE <= validD;
         end
     end
 
@@ -181,6 +185,7 @@ module RV32I_core (
             resultSrcM <= '0;
             rdM <= '0;
             pcPlus4M <= '0;
+            validM <= 1'b0;
         end else begin
             aluResultM <= aluResult;
             writeDataM <= fwdB;
@@ -190,6 +195,7 @@ module RV32I_core (
             resultSrcM <= resultSrcE;
             rdM <= rdE;
             pcPlus4M <= pcPlus4E;
+            validM <= validE;
         end
     end
 
@@ -201,8 +207,6 @@ module RV32I_core (
     assign readDataM = dmemRData;
 
     // ===== MEM/WB =====
-    
-
     always_ff @( posedge clk ) begin : registerMEMWB
         if (reset) begin
             aluResultW <= '0;
@@ -211,6 +215,7 @@ module RV32I_core (
             resultSrcW <= '0;
             rdW <= '0;
             pcPlus4W <= '0;
+            validW <= 1'b0;
         end else begin
             aluResultW <= aluResultM;
             readDataW <= readDataM;
@@ -218,11 +223,11 @@ module RV32I_core (
             resultSrcW <= resultSrcM;
             rdW <= rdM;
             pcPlus4W <= pcPlus4M;
+            validW <= validM;
         end
     end
 
     // ===== WB =====
-
     always_comb begin : Writeback
         case (resultSrcW)
             2'b00  : resultW = aluResultW;

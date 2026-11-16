@@ -35,7 +35,4 @@ module HazardUnit (
     assign stallD = lwStall;
     assign flushD = pcSrcE;
     assign flushE = lwStall || pcSrcE; 
-
- 
-
 endmodule
