@@ -3,9 +3,9 @@
 module HazardUnit (
     input logic [4:0] rs1E, rs2E, rdM, rdW, rs1D, rs2D, rdE,
     input logic [1:0] resultSrcE,
-    input logic regWriteW, regWriteM,
+    input logic regWriteW, regWriteM, pcSrcE,
     output logic [1:0] forwardAE, forwardBE,
-    output logic  stallF, stallD, flushE
+    output logic  stallF, stallD, flushE, flushD
 );
     logic lwStall;
 
@@ -33,7 +33,8 @@ module HazardUnit (
 
     assign stallF = lwStall;
     assign stallD = lwStall;
-    assign flushE = lwStall;
+    assign flushD = pcSrcE;
+    assign flushE = lwStall || pcSrcE; 
 
  
 

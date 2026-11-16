@@ -55,8 +55,6 @@ module RV32I_core (
     assign instrF = instr;
 
     // ===== IF/ID =====
-    assign flushD = 1'b0;
-
     always_ff @( posedge clk ) begin : RegisterIFID
         if (reset || flushD) begin
             instrD <= 32'h0000_0013;
@@ -239,7 +237,8 @@ module RV32I_core (
         .rs1D(rs1D), .rs2D(rs2D), .rdE(rdE), .resultSrcE(resultSrcE),
         .regWriteM(regWriteM), .regWriteW(regWriteW),
         .forwardAE(forwardAE), .forwardBE(forwardBE),
-        .stallF(stallF), .stallD(stallD), .flushE(flushE)
+        .stallF(stallF), .stallD(stallD), .flushE(flushE), .pcSrcE(pcSrcE),
+        .flushD(flushD)
     );
 
 endmodule
