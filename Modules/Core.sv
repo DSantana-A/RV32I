@@ -15,7 +15,7 @@ module RV32I_core (
   // ----- ID -----
     logic [31:0] instrD, pcD, pcPlus4D;
     logic [31:0] immExtD, rdData1D, rdData2D;
-    logic [4:0]  rdD;
+    logic [4:0]  rdD, rs1D, rs2D;
     logic [3:0]  aluOpD;
     logic [2:0]  immSrcD, funct3D;
     logic [1:0]  resultSrcD;
@@ -24,11 +24,11 @@ module RV32I_core (
 
     // ----- EX -----
     logic [31:0] pcE, pcPlus4E, immExtE, rdData1E, rdData2E;
-    logic [31:0] srcA, srcB, aluResult, pcSum, pcTargetE;
-    logic [4:0]  rdE;
+    logic [31:0] srcA, srcB, aluResult, pcSum, pcTargetE, fwdA, fwdB;
+    logic [4:0]  rdE, rs1E, rs2E;
     logic [3:0]  aluOpE;
     logic [2:0]  funct3E;
-    logic [1:0]  resultSrcE;
+    logic [1:0]  resultSrcE, forwardAE, forwardBE;
     logic regWriteE, aluSrcE, aluSrcAE, branchE, jumpE, jalrE, memWriteE;
     logic zero, condition, pcSrcE, flushE;
 
@@ -70,6 +70,8 @@ module RV32I_core (
     end
 
     // ===== ID =====
+    assign rs1D = instrD[19:15];
+    assign rs2D = instrD[24:20];
     assign funct3D = instrD[14:12];
     assign rdD = instrD[11:7];
 
@@ -84,7 +86,7 @@ module RV32I_core (
 
     RegisterFile rf (
         .clk(clk), .reset(reset), .wEn(regWriteW),
-        .rs1(instrD[19:15]), .rs2(instrD[24:20]), .rd(rdW),
+        .rs1(rs1D), .rs2(rs2D), .rd(rdW),
         .wd(resultW), .rdData1(rdData1D), .rdData2(rdData2D)
     );
 
@@ -109,7 +111,8 @@ module RV32I_core (
             regWriteE <= '0;
             pcPlus4E  <= '0;
             rdE <= '0;
-
+            rs1E <= '0;
+            rs2E <= '0;
         end else begin
             aluSrcAE <= aluSrcAD;
             aluSrcE <= aluSrcD;
@@ -127,12 +130,30 @@ module RV32I_core (
             regWriteE <= regWriteD;
             pcPlus4E  <= pcPlus4D;
             rdE <= rdD;
+            rs1E <= rs1D;
+            rs2E <= rs2D;
         end
     end
 
     // ===== EX =====
-    assign srcA = aluSrcAE ? pcE     : rdData1E;
-    assign srcB = aluSrcE  ? immExtE : rdData2E;
+    always_comb begin : ForwardMux
+        case (forwardAE)
+            2'b00: fwdA = rdData1E;
+            2'b01: fwdA = resultW;
+            2'b10: fwdA = aluResultM; 
+            default: fwdA = rdData1E;
+        endcase
+        
+        case (forwardBE)
+            2'b00: fwdB = rdData2E;
+            2'b01: fwdB = resultW;
+            2'b10: fwdB = aluResultM;  
+            default: fwdB = rdData2E;
+        endcase
+    end
+
+    assign srcA = aluSrcAE ? pcE : fwdA;
+    assign srcB = aluSrcE ? immExtE : fwdB;
 
     ALU alu (.inputA(srcA), .inputB(srcB), .aluOp(aluOpE), .result(aluResult), .zero(zero));
 
@@ -166,7 +187,7 @@ module RV32I_core (
             pcPlus4M <= '0;
         end else begin
             aluResultM <= aluResult;
-            writeDataM <= rdData2E;
+            writeDataM <= fwdB;
             funct3M <= funct3E;
             memWriteM <= memWriteE;
             regWriteM <= regWriteE;
@@ -215,4 +236,10 @@ module RV32I_core (
         endcase
     end
     
+    HazardUnit hu (
+        .rs1E(rs1E), .rs2E(rs2E), .rdM(rdM), .rdW(rdW),
+        .regWriteM(regWriteM), .regWriteW(regWriteW),
+        .forwardAE(forwardAE), .forwardBE(forwardBE)
+    );
+
 endmodule

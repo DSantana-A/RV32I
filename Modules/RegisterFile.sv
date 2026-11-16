@@ -21,7 +21,7 @@ module RegisterFile #(
             registers[rd] <= wd;
     end
 
-    assign rdData1 = (rs1 == '0) ? '0 : registers[rs1];
-    assign rdData2 = (rs2 == '0) ? '0 : registers[rs2];
+    assign rdData1 = (rs1 == '0) ? '0 : (wEn && (rd == rs1)) ? wd : registers[rs1];
+    assign rdData2 = (rs2 == '0) ? '0 : (wEn && (rd == rs2)) ? wd : registers[rs2];
 
 endmodule
