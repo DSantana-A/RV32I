@@ -1,11 +1,14 @@
 `timescale 1ns/1ps
 
 module HazardUnit (
-    input logic [4:0] rs1E, rs2E, rdM, rdW,
+    input logic [4:0] rs1E, rs2E, rdM, rdW, rs1D, rs2D, rdE,
+    input logic [1:0] resultSrcE,
     input logic regWriteW, regWriteM,
-    output logic [1:0] forwardAE, forwardBE
+    output logic [1:0] forwardAE, forwardBE,
+    output logic  stallF, stallD, flushE
 );
-    
+    logic lwStall;
+
     always_comb begin : BlockA
         if (regWriteM && (rdM != '0) && (rdM == rs1E)) begin
             forwardAE = 2'b10;
@@ -25,5 +28,13 @@ module HazardUnit (
             forwardBE = 2'b00;
         end
     end
+
+    assign lwStall = (resultSrcE == 2'b01) && (rdE != 0) && ((rdE == rs1D) || (rdE == rs2D));
+
+    assign stallF = lwStall;
+    assign stallD = lwStall;
+    assign flushE = lwStall;
+
+ 
 
 endmodule

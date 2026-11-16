@@ -11,6 +11,7 @@ module RV32I_core (
 );    
     // ----- IF -----
     logic [31:0] pcF, pcPlus4F, instrF;
+    logic stallF;
 
   // ----- ID -----
     logic [31:0] instrD, pcD, pcPlus4D;
@@ -48,13 +49,12 @@ module RV32I_core (
     // ===== IF =====
     ProgramCounter pcReg (
         .clk(clk), .reset(reset), .pcSrc(pcSrcE),
-        .pcTarget(pcTargetE), .pc(pcF), .pcPlus4(pcPlus4F)
+        .pcTarget(pcTargetE), .pc(pcF), .pcPlus4(pcPlus4F), .stall(stallF)
     );
     assign imemAddr  = pcF;
     assign instrF = instr;
 
     // ===== IF/ID =====
-    assign stallD = 1'b0;
     assign flushD = 1'b0;
 
     always_ff @( posedge clk ) begin : RegisterIFID
@@ -91,8 +91,6 @@ module RV32I_core (
     );
 
     // ===== ID/EX =====
-    assign flushE = 1'b0;
-
     always_ff @( posedge clk ) begin : RegisterIDEX
         if (reset || flushE) begin
             aluSrcAE <= '0;
@@ -238,8 +236,10 @@ module RV32I_core (
     
     HazardUnit hu (
         .rs1E(rs1E), .rs2E(rs2E), .rdM(rdM), .rdW(rdW),
+        .rs1D(rs1D), .rs2D(rs2D), .rdE(rdE), .resultSrcE(resultSrcE),
         .regWriteM(regWriteM), .regWriteW(regWriteW),
-        .forwardAE(forwardAE), .forwardBE(forwardBE)
+        .forwardAE(forwardAE), .forwardBE(forwardBE),
+        .stallF(stallF), .stallD(stallD), .flushE(flushE)
     );
 
 endmodule

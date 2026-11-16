@@ -1,4 +1,4 @@
-  .text
+    .text
     .globl _start
 _start:
     addi  x1, x0, 5          # 00: x1 = 5
@@ -12,7 +12,7 @@ _start:
     addi  x8, x0, 4          # 20: x8 = 4
     sw    x8, 0(x8)          # 24: mem[4] = 4  fwd addr y dato
     lw    x9, 0(x8)          # 28: x9 = 4
-    add   x10, x9, x9        # 2C: x10 = 8     load-use
+    add   x10, x9, x9        # 2C: x10 = 8     load-use (dir = dato, no lo detecta)
     beq   x10, x3, taken     # 30: tomado -> 0x3C
     addi  x11, x0, 1         # 34: flush (x11 = 0)
     addi  x11, x0, 2         # 38: saltada
@@ -29,5 +29,9 @@ target:
     addi  x16, x0, 1         # 54: flush (x16 = 0)
     lui   x17, 0x12345       # 58: x17 = 0x12345000
     auipc x18, 0             # 5C: x18 = 0x5C
+    addi  x19, x0, 100       # 60: x19 = 100
+    sw    x19, 8(x0)         # 64: mem[8] = 100  fwd dato del store (dist 1)
+    lw    x20, 8(x0)         # 68: x20 = 100
+    add   x21, x20, x20      # 6C: x21 = 200     load-use real (dir 8 ≠ dato 100)
 end:
-    jal   x0, end            # 60: loop infinito (fin)
+    jal   x0, end            # 70: loop infinito (fin)

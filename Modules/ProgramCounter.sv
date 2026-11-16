@@ -3,7 +3,7 @@
 module ProgramCounter #(
     parameter logic [31:0] RESETADDR = 32'h0000_0000
 ) (
-    input logic clk, reset, pcSrc,
+    input logic clk, reset, pcSrc, stall,
     input logic [31:0] pcTarget,
     output logic [31:0] pc, pcPlus4
 );
@@ -15,8 +15,10 @@ module ProgramCounter #(
     always_ff @( posedge clk ) begin : Register
         if (reset) begin
             pc <= RESETADDR;
-        end else begin
+        end else if (!stall) begin
             pc <= pcNext;
+        end else begin
+            pc <= pc;
         end
     end
 
